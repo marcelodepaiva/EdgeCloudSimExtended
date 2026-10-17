@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<applications>
+	 
+	    <!-- Define a probabilidade (0 a 100) de um dispositivo móvel escolher esta aplicação ao gerar uma nova tarefa 
+		<usage_percentage>100</usage_percentage>
+		 A probabilidade (0 a 100) de o Orquestrador enviar a tarefa diretamente para a Nuvem, ignorando a Borda. 
+		Se for 0, ele tentará sempre a Borda primeiro 
+		<prob_cloud_selection>10</prob_cloud_selection>
+		O valor representa o tempo médio (geralmente em segundos) que um usuário "descansa"
+		Se você tem 1000 dispositivos, terá aproximadamente $1000 / 7 \approx 142$ tarefas sendo criadas por segundo no sistema todo.				 
+		<poisson_interarrival>7</poisson_interarrival>
+		 define a prioridade ou o "nível de urgência" de uma aplicação em relação ao tempo de resposta.
+		O valor 0 indica que a aplicação tem a menor sensibilidade ao atraso possível.
+		O Orquestrador entende que pode enviar essa tarefa para a Cloud (Nuvem), mesmo que o atraso da rede WAN seja maior, 
+		para economizar os recursos limitados da Borda (Edge) para aplicações mais urgentes.
+		O vakir 1 indica que o atraso deve ser o minimo - cirurgia remota		
+		<delay_sensitivity>0</delay_sensitivity>
+		  tempo de vida de uso da aplicação por parte de um dispositivo móvel
+		 Após os 30 segundos, o dispositivo encerra a aplicação e entra em um estado "inativo
+		<active_period>30</active_period>
+		define o tempo de "descanso" ou inatividade do dispositivo móvel entre duas sessões de uso da aplicação
+            o dispositivo permanece "com o celular no bolso". Ele continua se movendo pelo mapa (mobilidade), 
+            mas não gera nenhuma tarefa e não consome recursos de CPU ou banda.
+            Em um cenário real, nem todos os usuários de uma cidade usam a rede simultaneamente.
+		<idle_period>45</idle_period>
+		 define o tamanho da carga de dados que o dispositivo móvel precisa enviar para o servidor (Borda ou Nuvem)
+		 para que a tarefa possa ser processada.
+		 250 KB é um valor "intermediário". Ele é pesado o suficiente para que a latência da rede seja notada nos gráficos,
+		  mas leve o suficiente para não saturar instantaneamente um ponto de acesso Wi-Fi comum no EdgeCloudSim.		 
+		<data_upload>250</data_upload>
+		 define o tamanho da resposta que o servidor (Edge ou Cloud) envia de volta para o dispositivo móvel após processar a tarefa.
+		<data_download>1000</data_download>
+		 define o tamanho da carga computacional da tarefa. No EdgeCloudSim, esse valor é expresso em Milhões de Instruções (MI).
+		O valor 9000 é considerado uma carga de processamento relativamente alta.
+		Se a sua VM de Borda tem 1000 MIPS, a tarefa levará 9 segundos para ser processada ($9000 / 1000 = 9$).
+		Se a sua VM de Nuvem tem 10000 MIPS, a tarefa levará apenas 0.9 segundos.
+		<task_length>9000</task_length>
+		 indica quantos núcleos de CPU (vCPUs) uma Máquina Virtual (VM) deve ter, no mínimo, para ser 
+		considerada apta a processar essa aplicação específica. 
+		<required_core>1</required_core>
+		 define o modelo de utilização de recursos da Máquina Virtual (VM) quando a tarefa é executada em um servidor de borda (Edge).
+		isso significa que cada tarefa do seu INFOTAINMENT_APP consumirá apenas 3.6% da CPU da VM enquanto estiver sendo processada.
+		<vm_utilization_on_edge>3.6</vm_utilization_on_edge>
+		 define a porcentagem de CPU que a tarefa consumirá quando for executada em um servidor na Nuvem (Cloud).
+		<vm_utilization_on_cloud>0.36</vm_utilization_on_cloud>
+		  define o quanto da CPU do próprio dispositivo móvel (smartphone, tablet, etc.) é consumida para processar a tarefa.
+		 Ao definir este valor como 0, você está dizendo ao simulador que o dispositivo móvel não processa nada localmente.
+
+		<vm_utilization_on_mobile>0</vm_utilization_on_mobile>
+	</application>
+			  -->
+	<!-- Scenario B2: High contention -->
+	<application name="SUSTAINABILITY_APP"> 
+	
+	    <!-- Define a probabilidade (0 a 100) de um dispositivo móvel escolher esta aplicação ao gerar uma nova tarefa -->
+		<usage_percentage>100</usage_percentage>
+		
+		<!-- A probabilidade (0 a 100) de o Orquestrador enviar a tarefa diretamente para a Nuvem, ignorando a Borda. 
+		Se for 0, ele tentará sempre a Borda primeiro -->
+		<prob_cloud_selection>0</prob_cloud_selection>
+		
+		<!-- O valor representa o tempo médio (geralmente em segundos) que um usuário "descansa"
+		Se você tem 1000 dispositivos, terá aproximadamente $1000 / 7 \approx 142$ tarefas sendo criadas por segundo no sistema todo.		
+		 -->
+		<poisson_interarrival>1200</poisson_interarrival>
+		
+		<!-- define a prioridade ou o "nível de urgência" de uma aplicação em relação ao tempo de resposta.
+		O valor 0 indica que a aplicação tem a menor sensibilidade ao atraso possível.
+		O Orquestrador entende que pode enviar essa tarefa para a Cloud (Nuvem), mesmo que o atraso da rede WAN seja maior, 
+		para economizar os recursos limitados da Borda (Edge) para aplicações mais urgentes.
+		O vakir 1 indica que o atraso deve ser o minimo - cirurgia remota
+		Mantida baixa. Como é "offline-first", se a foto demorar 10 ou 20 segundos para subir enquanto o aluno caminha pela escola,
+		 o sistema não deve considerar como falha, pois o dado está protegido no armazenamento temporário do mobile.	
+		 
+		 Como as fotos também vão para a Cloud, o tempo total (Upload Mobile→Fog + Upload Fog→Cloud) será maior. Definir uma sensibilidade
+		  baixa é vital para que o simulador não marque essas tarefas como "falhas" só porque o trajeto até a nuvem demorou.	
+		 -->
+		<delay_sensitivity>0.1</delay_sensitivity>
+		
+		 <!-- tempo de vida de uso da aplicação por parte de um dispositivo móvel
+		 Após os 30 segundos, o dispositivo encerra a aplicação e entra em um estado "inativo
+		 Registrar uma ação com foto demora mais do que um formulário simples. 
+		 O aluno fica "ativo" por 2 minutos para garantir o upload completo, com envios a cada 45 segundos em média.
+		  -->
+		<active_period>60</active_period>
+		
+		<!--define o tempo de "descanso" ou inatividade do dispositivo móvel entre duas sessões de uso da aplicação
+            o dispositivo permanece "com o celular no bolso". Ele continua se movendo pelo mapa (mobilidade), 
+            mas não gera nenhuma tarefa e não consome recursos de CPU ou banda.
+            Em um cenário real, nem todos os usuários de uma cidade usam a rede simultaneamente.
+            Escalabilidade (24.000 Dispositivos): Com tantos alunos, aumentamos o idle_period para 1800s (30 minutos). 
+            Isso simula a realidade de que nem todo aluno registra uma ação de sustentabilidade ao mesmo tempo.
+            No EdgeCloudSim, isso evita que o Eclipse trave por falta de memória RAM ao gerenciar milhões de eventos simultâneos.
+-->
+		<idle_period>1440</idle_period>
+		<data_upload>1200</data_upload> <data_download>400</data_download> 
+		<task_length>12000</task_length> <required_core>1</required_core>
+
+		       
+        <message name="MOBILE_TO_EDGE_MSG" source="MOBILE_DEVICE" destination="EDGE_PRE_PROCESSOR" />
+        <message name="EDGE_TO_CLOUD_MSG" source="EDGE_PRE_PROCESSOR" destination="CLOUD_FINAL_PROCESSOR" />
+        <message name="CLOUD_RESPONSE_MSG" source="CLOUD_FINAL_PROCESSOR" destination="MOBILE_DEVICE" />
+        
+        
+        <vm_utilization_on_edge>6.0</vm_utilization_on_edge>
+        <vm_utilization_on_cloud>1.0</vm_utilization_on_cloud>
+        <vm_utilization_on_mobile>0</vm_utilization_on_mobile>
+        
+	</application>	
+	
+</applications>
